@@ -15,14 +15,25 @@ class NewTweetViewController: UIViewController {
     @IBOutlet weak var userIdLabel: UILabel!
     @IBOutlet weak var messageTextView: UITextView!
     
+    var selectedIndex: Int?
+    
     @IBAction func newTweetButton_OnClick(sender: AnyObject) {
         NSLog("NewTweetViewController.newTweetButton_OnClick")
+        selectedIndex = nil
         self.navigationController?.popViewControllerAnimated(true)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         NSLog("NewTweetViewController.viewDidLoad")
+        
+        if selectedIndex != nil {
+            usernameLabel?.text = "User Name \(selectedIndex!)"
+            userIdLabel?.text = "@userid\(selectedIndex!)"
+            //timeLabel?.text = "\(selectedIndex)h"
+            messageTextView.text = "Enter message to @userid\(selectedIndex!)"
+        }
+        
         let thumbImageURL = "http://www.rjjulia.com/sites/rjjulia.com/files/twitter_icon-jpg1.png"
         if let checkedThumbImageURL = NSURL(string: thumbImageURL) {
             downloadImage(checkedThumbImageURL, imageView: thumbImageView)

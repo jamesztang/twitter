@@ -15,13 +15,22 @@ class TweetViewController: UIViewController {
     @IBOutlet weak var userIdLabel: UILabel!
     @IBOutlet weak var messageTextView: UITextView!
 
+    var selectedIndex: Int!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        usernameLabel?.text = "User Name \(selectedIndex)"
+        userIdLabel?.text = "@userid\(selectedIndex)"
+        //timeLabel?.text = "\(selectedIndex)h"
+        messageTextView.text = "Message \(selectedIndex)"
 
         let thumbImageURL = "http://www.rjjulia.com/sites/rjjulia.com/files/twitter_icon-jpg1.png"
         if let checkedThumbImageURL = NSURL(string: thumbImageURL) {
             downloadImage(checkedThumbImageURL, imageView: thumbImageView)
         }
+        
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -43,14 +52,13 @@ class TweetViewController: UIViewController {
             }.resume()
     }
 
-    /*
+
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        let tweetViewController = segue.destinationViewController as! NewTweetViewController
+        tweetViewController.selectedIndex = selectedIndex
     }
-    */
 
 }

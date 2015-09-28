@@ -10,9 +10,13 @@ import UIKit
 
 class HomeTableViewController: UITableViewController {
 
+    var tweets: NSArray?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        print("HomeTableViewController.viewDidLoad")
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -20,6 +24,30 @@ class HomeTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
 
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        print("HomeTableViewController.viewDidAppear")
+        
+        
+        let twitterURLString = "http://localhost/~ztang1/twitter.json"
+        let request = NSMutableURLRequest(URL: NSURL(string: twitterURLString)!)
+        let task = NSURLSession.sharedSession().dataTaskWithRequest(request) {
+            (data, response, error) -> Void in
+            if let dictionary = try! NSJSONSerialization.JSONObjectWithData(data!, options: []) as? NSArray {
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.tweets = dictionary
+                    self.tableView.reloadData()
+                    NSLog("Dictionary: \(self.tweets)")
+                }
+            }
+            else {
+                print("no data")
+            }
+        }
+        task.resume()
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -41,7 +69,7 @@ class HomeTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Tweet Cell", forIndexPath: indexPath) as! TweetTableViewCell
 
-        cell.usernameLabel?.text = "James Tang @jamestang \(indexPath.row)"
+        cell.usernameLabel?.text = "User Name \(indexPath.row)  @userid\(indexPath.row)"
         cell.timeLabel?.text = "\(indexPath.row)h"
         cell.messageLabel.text = "Message \(indexPath.row)"
         let thumbImageURL = "http://www.rjjulia.com/sites/rjjulia.com/files/twitter_icon-jpg1.png"
@@ -87,15 +115,26 @@ class HomeTableViewController: UITableViewController {
     }
     */
 
-    /*
+
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        
+        if let cell = sender as? UITableViewCell {
+            print("go to view tweet")
+            let indexPath = tableView.indexPathForCell(cell)!
+            
+            let tweetViewController = segue.destinationViewController as! TweetViewController
+            tweetViewController.selectedIndex = indexPath.row
+        }
+        else {
+            print("go to new tweet")
+        }
     }
-    */
+
 
     func downloadImage(url:NSURL, imageView: UIImageView) {
         getDataFromUrl(url) { data in
