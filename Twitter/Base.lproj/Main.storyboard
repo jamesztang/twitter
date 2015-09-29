@@ -28,8 +28,8 @@
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eOR-BD-rWv" userLabel="Message Label">
-                                            <rect key="frame" x="88" y="39" width="54.5" height="16"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eOR-BD-rWv" userLabel="Message Label">
+                                            <rect key="frame" x="88" y="39" width="494" height="31.5"/>
                                             <string key="text">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et ma</string>
                                             <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -43,7 +43,7 @@
                                             </constraints>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2h" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hc1-Bg-HwP">
-                                            <rect key="frame" x="566.5" y="13.5" width="15.5" height="16"/>
+                                            <rect key="frame" x="566" y="13" width="15.5" height="16"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
@@ -55,10 +55,17 @@
                                         <constraint firstItem="eOR-BD-rWv" firstAttribute="leading" secondItem="iLu-aC-lnG" secondAttribute="trailing" constant="5" id="Ez4-PA-769"/>
                                         <constraint firstItem="Hc1-Bg-HwP" firstAttribute="centerY" secondItem="2Jd-jd-zd9" secondAttribute="centerY" id="RQv-s6-BOl"/>
                                         <constraint firstItem="2Jd-jd-zd9" firstAttribute="leading" secondItem="iLu-aC-lnG" secondAttribute="trailing" constant="5" id="gXb-8R-9GA"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="eOR-BD-rWv" secondAttribute="trailing" constant="10" id="iZV-Xl-wKM"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="eOR-BD-rWv" secondAttribute="bottom" constant="5" id="lZx-yQ-ENX"/>
                                         <constraint firstItem="iLu-aC-lnG" firstAttribute="top" secondItem="u0K-jx-Rd8" secondAttribute="topMargin" constant="5" id="mRL-M0-baj"/>
                                         <constraint firstItem="iLu-aC-lnG" firstAttribute="leading" secondItem="u0K-jx-Rd8" secondAttribute="leadingMargin" constant="5" id="snK-KU-EwV"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="Hc1-Bg-HwP" secondAttribute="trailing" constant="10" id="yLY-e7-Uj9"/>
                                     </constraints>
+                                    <variation key="default">
+                                        <mask key="constraints">
+                                            <exclude reference="lZx-yQ-ENX"/>
+                                        </mask>
+                                    </variation>
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="messageLabel" destination="eOR-BD-rWv" id="eV4-r8-UaO"/>

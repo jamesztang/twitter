@@ -22,6 +22,17 @@ class HomeTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        
+        HTTPGetJSON1("http://127.0.0.1/~ztang1/twitter.json") {
+            (data: NSArray, error: String?) -> Void in
+            if error != nil {
+                print(error)
+            } else {
+                self.tweets = data
+                print("viewDidLoad - assigned tweets")
+                print(self.tweets?.count ?? 0)
+            }
+        }
     }
 
     override func viewDidAppear(animated: Bool) {
@@ -40,12 +51,14 @@ class HomeTableViewController: UITableViewController {
 //                }
 //        }
 
-        HTTPGetJSON("http://127.0.0.1/~ztang1/twitter.json") {
-            (data: Dictionary<String, AnyObject>, error: String?) -> Void in
+        HTTPGetJSON1("http://127.0.0.1/~ztang1/twitter.json") {
+            (data: NSArray, error: String?) -> Void in
                 if error != nil {
                     print(error)
                 } else {
-                    print(data.count)
+                    self.tweets = data
+                    print("viewDidAppear - assigned tweets")
+                    print(self.tweets?.count ?? 0)
                 }
         }
 
@@ -65,8 +78,8 @@ class HomeTableViewController: UITableViewController {
 //            }
 //        }
 //        task.resume()
-        
         self.tableView.reloadData()
+        
     }
     
     override func didReceiveMemoryWarning() {
@@ -83,17 +96,29 @@ class HomeTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 10
+        if tweets != nil {
+            print("tableView.numberOfRowsInSection - tweets != nil - \(tweets?.count)")
+            return (self.tweets!.count)
+        }
+        else {
+            print("tableView.numberOfRowsInSection - tweets == nil - 0")
+            return 0
+        }
     }
 
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Tweet Cell", forIndexPath: indexPath) as! TweetTableViewCell
 
-        cell.usernameLabel?.text = "User Name \(indexPath.row)  @userid\(indexPath.row)"
+        let tweet = tweets![indexPath.row] as! NSDictionary
+        let user  = tweet["user"] as! NSDictionary
+        let username = user["name"] as! String
+        let screenname = user["screen_name"] as! String
+        cell.usernameLabel?.text = "User Name \(username)  @\(screenname)"
         cell.timeLabel?.text = "\(indexPath.row)h"
-        cell.messageLabel.text = "Message \(indexPath.row)"
-        let thumbImageURL = "http://www.rjjulia.com/sites/rjjulia.com/files/twitter_icon-jpg1.png"
+        cell.messageLabel.text = tweet["text"] as? String
+        
+        let thumbImageURL = user["profile_image_url"] as! String //"http://www.rjjulia.com/sites/rjjulia.com/files/twitter_icon-jpg1.png"
         if let checkedThumbImageURL = NSURL(string: thumbImageURL) {
             downloadImage(checkedThumbImageURL, imageView: cell.userImageView)
         }
@@ -147,9 +172,18 @@ class HomeTableViewController: UITableViewController {
         if let cell = sender as? UITableViewCell {
             print("go to view tweet")
             let indexPath = tableView.indexPathForCell(cell)!
+            let tweet = tweets![indexPath.row] as! NSDictionary
+            let user  = tweet["user"] as! NSDictionary
+            let username = user["name"] as! String
+            let screenname = user["screen_name"] as! String
             
             let tweetViewController = segue.destinationViewController as! TweetViewController
             tweetViewController.selectedIndex = indexPath.row
+            tweetViewController.username = "\(username)"
+            tweetViewController.userId = "@\(screenname)"
+            tweetViewController.message = tweet["text"] as? String
+            let thumbImageURL = user["profile_image_url"] as! String
+            tweetViewController.thumbImageURL = thumbImageURL
         }
         else {
             print("go to new tweet")
@@ -247,20 +281,63 @@ class HomeTableViewController: UITableViewController {
         }
     }
     
-//    HTTPGetJSON("http://itunes.apple.com/us/rss/topsongs/genre=6/json") {
-//        (data: Dictionary<String, AnyObject>, error: String?) -> Void in
-//            if error != nil {
-//                print(error)
-//            } else {
-//                if let feed = data["feed"] as? NSDictionary ,let entries = feed["entry"] as? NSArray {
-//                    for elem: AnyObject in entries {
-//                        if let dict = elem as? NSDictionary ,let titleDict = dict["title"] as? NSDictionary , let songName = titleDict["label"] as? String {
-//                            print(songName)
-//                        }
-//                    }
-//                }
-//            }
-//    }
+    //    HTTPGetJSON("http://itunes.apple.com/us/rss/topsongs/genre=6/json") {
+    //        (data: Dictionary<String, AnyObject>, error: String?) -> Void in
+    //            if error != nil {
+    //                print(error)
+    //            } else {
+    //                if let feed = data["feed"] as? NSDictionary ,let entries = feed["entry"] as? NSArray {
+    //                    for elem: AnyObject in entries {
+    //                        if let dict = elem as? NSDictionary ,let titleDict = dict["title"] as? NSDictionary , let songName = titleDict["label"] as? String {
+    //                            print(songName)
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //    }
+    
+    func JSONParseDict1(jsonString:String) -> NSArray {
+        if let data: NSData = jsonString.dataUsingEncoding(NSUTF8StringEncoding) {
+            do {
+                if let jsonObj = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0)) as? NSArray {
+                    return jsonObj
+                }
+            }
+            catch {
+                print("Error")
+            }
+        }
+        return NSArray()
+    }
+    
+    func HTTPsendRequest1(request: NSMutableURLRequest, callback: (String, String?) -> Void) {
+        let task = NSURLSession.sharedSession().dataTaskWithRequest(request, completionHandler: {
+            data, response, error in
+            if error != nil {
+                callback("", (error!.localizedDescription) as String)
+            }
+            else {
+                callback(NSString(data: data!, encoding: NSUTF8StringEncoding) as! String, nil)
+            }
+        })
+        task.resume()
+    }
+    
+    func HTTPGetJSON1(url: String, callback: (NSArray, String?) -> Void) {
+        let request = NSMutableURLRequest(URL: NSURL(string: url)!)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        HTTPsendRequest1(request) {
+            (data: String, error: String?) -> Void in
+            if error != nil {
+                callback(NSArray(), error)
+            }
+            else {
+                let jsonObj = self.JSONParseDict1(data)
+                callback(jsonObj, nil)
+            }
+        }
+    }
+    
 }
 
 class TweetTableViewCell : UITableViewCell {

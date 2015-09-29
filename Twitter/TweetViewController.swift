@@ -16,16 +16,25 @@ class TweetViewController: UIViewController {
     @IBOutlet weak var messageTextView: UITextView!
 
     var selectedIndex: Int!
+    var thumbImageURL: String!
+    var username: String!
+    var userId: String!
+    var message: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        usernameLabel?.text = "User Name \(selectedIndex)"
-        userIdLabel?.text = "@userid\(selectedIndex)"
+//        usernameLabel?.text = "User Name \(selectedIndex)"
+//        userIdLabel?.text = "@userid\(selectedIndex)"
+//        //timeLabel?.text = "\(selectedIndex)h"
+//        messageTextView.text = "Message \(selectedIndex)"
+//
+//        let thumbImageURL = "http://www.rjjulia.com/sites/rjjulia.com/files/twitter_icon-jpg1.png"
+        
+        usernameLabel?.text = username
+        userIdLabel?.text = userId
         //timeLabel?.text = "\(selectedIndex)h"
-        messageTextView.text = "Message \(selectedIndex)"
-
-        let thumbImageURL = "http://www.rjjulia.com/sites/rjjulia.com/files/twitter_icon-jpg1.png"
+        messageTextView.text = message
         if let checkedThumbImageURL = NSURL(string: thumbImageURL) {
             downloadImage(checkedThumbImageURL, imageView: thumbImageView)
         }
