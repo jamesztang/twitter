@@ -23,6 +23,9 @@ class HomeTableViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 200
+
         HTTPGetJSON1("http://127.0.0.1/~ztang1/twitter.json") {
             (data: NSArray, error: String?) -> Void in
             if error != nil {
@@ -114,7 +117,7 @@ class HomeTableViewController: UITableViewController {
         let user  = tweet["user"] as! NSDictionary
         let username = user["name"] as! String
         let screenname = user["screen_name"] as! String
-        cell.usernameLabel?.text = "User Name \(username)  @\(screenname)"
+        cell.usernameLabel?.text = "\(username)  @\(screenname)"
         cell.timeLabel?.text = "\(indexPath.row)h"
         cell.messageLabel.text = tweet["text"] as? String
         
