@@ -28,24 +28,45 @@ class HomeTableViewController: UITableViewController {
         super.viewDidAppear(animated)
         
         print("HomeTableViewController.viewDidAppear")
-        
-        
-        let twitterURLString = "http://localhost/~ztang1/twitter.json"
-        let request = NSMutableURLRequest(URL: NSURL(string: twitterURLString)!)
-        let task = NSURLSession.sharedSession().dataTaskWithRequest(request) {
-            (data, response, error) -> Void in
-            if let dictionary = try! NSJSONSerialization.JSONObjectWithData(data!, options: []) as? NSArray {
-                dispatch_async(dispatch_get_main_queue()) {
-                    self.tweets = dictionary
-                    self.tableView.reloadData()
-                    NSLog("Dictionary: \(self.tweets)")
+    
+//        HTTPGet("http://127.0.0.1/~ztang1/twitter.json") {
+//            (data: String, error: String?) -> Void in
+//                if error != nil {
+//                    print(error)
+//                }
+//                else {
+//                    print("data is : \n\n\n")
+//                    print(data)
+//                }
+//        }
+
+        HTTPGetJSON("http://127.0.0.1/~ztang1/twitter.json") {
+            (data: Dictionary<String, AnyObject>, error: String?) -> Void in
+                if error != nil {
+                    print(error)
+                } else {
+                    print(data.count)
                 }
-            }
-            else {
-                print("no data")
-            }
         }
-        task.resume()
+
+//        let twitterURLString = "http://127.0.0.1/~ztang1/twitter.json"
+//        let request = NSMutableURLRequest(URL: NSURL(string: twitterURLString)!)
+//        let task = NSURLSession.sharedSession().dataTaskWithRequest(request) {
+//            (data, response, error) -> Void in
+//            if let dictionary = try! NSJSONSerialization.JSONObjectWithData(data!, options: []) as? NSArray {
+//                dispatch_async(dispatch_get_main_queue()) {
+//                    self.tweets = dictionary
+//                    self.tableView.reloadData()
+//                    NSLog("Dictionary: \(self.tweets)")
+//                }
+//            }
+//            else {
+//                print("no data")
+//            }
+//        }
+//        task.resume()
+        
+        self.tableView.reloadData()
     }
     
     override func didReceiveMemoryWarning() {
@@ -145,11 +166,101 @@ class HomeTableViewController: UITableViewController {
     }
     
     func getDataFromUrl(urL: NSURL, completion: ((data: NSData?) -> Void)) {
-        NSURLSession.sharedSession().dataTaskWithURL(urL) { (data, response, error) in
-            completion(data: data)
-            }.resume()
+        NSURLSession.sharedSession().dataTaskWithURL(urL) {
+            (data, response, error) in
+                completion(data: data)
+        }.resume()
     }
 
+    
+    func HTTPSendRequest(request: NSMutableURLRequest, callback: (String, String?) -> Void) {
+        let task = NSURLSession.sharedSession().dataTaskWithRequest(request, completionHandler: {
+            data, response, error in
+                if error != nil {
+                    callback("", (error!.localizedDescription) as String)
+                }
+                else {
+                    callback(NSString(data: data!, encoding: NSUTF8StringEncoding) as! String, nil)
+                }
+        })
+        task.resume() //Tasks are called with .resume()
+        
+    }
+    
+    func HTTPGet(url: String, callback: (String, String?) -> Void) {
+        let request = NSMutableURLRequest(URL: NSURL(string: url)!) //To get the URL of the receiver , var URL: NSURL? is used
+        HTTPSendRequest(request, callback: callback)
+    }
+    
+    
+//    HTTPGet("http://www.google.com") {
+//        (data: String, error: String?) -> Void in
+//        if error != nil {
+//            print(error)
+//        }
+//        else {
+//            print("data is : \n\n\n")
+//            print(data)
+//        }
+//    }
+
+    
+    func JSONParseDict(jsonString:String) -> Dictionary<String, AnyObject> {
+        if let data: NSData = jsonString.dataUsingEncoding(NSUTF8StringEncoding) {
+            do {
+                if let jsonObj = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0)) as? Dictionary<String, AnyObject> {
+                    return jsonObj
+                }
+            }
+            catch {
+                print("Error")
+            }
+        }
+        return [String: AnyObject]()
+    }
+    
+    func HTTPsendRequest(request: NSMutableURLRequest, callback: (String, String?) -> Void) {
+        let task = NSURLSession.sharedSession().dataTaskWithRequest(request, completionHandler: {
+            data, response, error in
+                if error != nil {
+                    callback("", (error!.localizedDescription) as String)
+                }
+                else {
+                    callback(NSString(data: data!, encoding: NSUTF8StringEncoding) as! String, nil)
+                }
+        })
+        task.resume()
+    }
+    
+    func HTTPGetJSON(url: String, callback: (Dictionary<String, AnyObject>, String?) -> Void) {
+        let request = NSMutableURLRequest(URL: NSURL(string: url)!)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        HTTPsendRequest(request) {
+            (data: String, error: String?) -> Void in
+                if error != nil {
+                    callback(Dictionary<String, AnyObject>(), error)
+                }
+                else {
+                    let jsonObj = self.JSONParseDict(data)
+                    callback(jsonObj, nil)
+                }
+        }
+    }
+    
+//    HTTPGetJSON("http://itunes.apple.com/us/rss/topsongs/genre=6/json") {
+//        (data: Dictionary<String, AnyObject>, error: String?) -> Void in
+//            if error != nil {
+//                print(error)
+//            } else {
+//                if let feed = data["feed"] as? NSDictionary ,let entries = feed["entry"] as? NSArray {
+//                    for elem: AnyObject in entries {
+//                        if let dict = elem as? NSDictionary ,let titleDict = dict["title"] as? NSDictionary , let songName = titleDict["label"] as? String {
+//                            print(songName)
+//                        }
+//                    }
+//                }
+//            }
+//    }
 }
 
 class TweetTableViewCell : UITableViewCell {
